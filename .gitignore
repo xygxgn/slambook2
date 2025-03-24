@@ -34,3 +34,10 @@
 *cmake-build-*
 *.idea
 **build**
+
+kitti00/
+rgbd_dataset_freiburg1_desk2/
+rgbd_dataset_freiburg1_desk2.tgz
+remode_test_data/
+remode_test_data.zip
+.vscode/

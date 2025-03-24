@@ -52,6 +52,7 @@ public:
             Quaterniond(data[6], data[3], data[4], data[5]),
             Vector3d(data[0], data[1], data[2])
         ));
+        return true;
     }
 
     virtual bool write(ostream &os) const override {
@@ -59,6 +60,7 @@ public:
         Quaterniond q = _estimate.unit_quaternion();
         os << _estimate.translation().transpose() << " ";
         os << q.coeffs()[0] << " " << q.coeffs()[1] << " " << q.coeffs()[2] << " " << q.coeffs()[3] << endl;
+        // 需要加入返回值
         return true;
     }
 

@@ -286,6 +286,7 @@ bool update(const Mat &ref, const Mat &curr, const SE3d &T_C_R, Mat &depth, Mat 
             // 匹配成功，更新深度图
             updateDepthFilter(Vector2d(x, y), pt_curr, T_C_R, epipolar_direction, depth, depth_cov2);
         }
+        return true;
 }
 
 // 极线搜索

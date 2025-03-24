@@ -12,29 +12,60 @@ using namespace std;
 
 int main( int argc, char** argv )
 {
+    // string dataset_dir = argv[1];
+    // ifstream fin ( dataset_dir+"/associate.txt" );
+    // if ( !fin )
+    // {
+    //     cout<<"please generate the associate file called associate.txt!"<<endl;
+    //     return 1;
+    // }
+    
+    // while ( !fin.eof() )
+    // {
+    //     string rgb_time, rgb_file, depth_time, depth_file;
+    //     fin>>rgb_time>>rgb_file>>depth_time>>depth_file;
+    //     rgb_times.push_back ( atof ( rgb_time.c_str() ) );
+    //     depth_times.push_back ( atof ( depth_time.c_str() ) );
+    //     rgb_files.push_back ( dataset_dir+"/"+rgb_file );
+    //     depth_files.push_back ( dataset_dir+"/"+depth_file );
+
+    //     if ( fin.good() == false )
+    //         break;
+    // }
+    // fin.close();
+
+
     string dataset_dir = argv[1];
-    ifstream fin ( dataset_dir+"/associate.txt" );
-    if ( !fin )
+    ifstream fin_rgb ( dataset_dir+"/rgb.txt" );
+    if ( !fin_rgb )
     {
-        cout<<"please generate the associate file called associate.txt!"<<endl;
+        cout<<"please generate the associate file called rgb.txt!"<<endl;
+        return 1;
+    }
+    ifstream fin_depth ( dataset_dir+"/depth.txt" );
+    if ( !fin_depth )
+    {
+        cout<<"please generate the associate file called depth.txt!"<<endl;
         return 1;
     }
 
     vector<string> rgb_files, depth_files;
     vector<double> rgb_times, depth_times;
-    while ( !fin.eof() )
+    while ( !fin_rgb.eof() && !fin_depth.eof())
     {
         string rgb_time, rgb_file, depth_time, depth_file;
-        fin>>rgb_time>>rgb_file>>depth_time>>depth_file;
+        fin_rgb>>rgb_time>>rgb_file;
+        fin_depth>>depth_time>>depth_file;
         rgb_times.push_back ( atof ( rgb_time.c_str() ) );
         depth_times.push_back ( atof ( depth_time.c_str() ) );
         rgb_files.push_back ( dataset_dir+"/"+rgb_file );
         depth_files.push_back ( dataset_dir+"/"+depth_file );
-
-        if ( fin.good() == false )
+        
+        if ( fin_rgb.good() == false || fin_depth.good() == false )
             break;
     }
-    fin.close();
+    fin_rgb.close();
+    fin_depth.close();
     
     cout<<"generating features ... "<<endl;
     vector<Mat> descriptors;
