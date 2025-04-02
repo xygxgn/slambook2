@@ -14,6 +14,8 @@
 
 using namespace std;
 
+#define USE_ANALYTIC_DIFF 0
+
 // 曲线模型的顶点，模板参数：优化变量维度和数据类型
 class CurveFittingVertex : public g2o::BaseVertex<3, Eigen::Vector3d> {
 public:
@@ -30,9 +32,9 @@ public:
   }
 
   // 存盘和读盘：留空
-  virtual bool read(istream &in) {}
+  virtual bool read(istream &in) { return false; }
 
-  virtual bool write(ostream &out) const {}
+  virtual bool write(ostream &out) const { return false; }
 };
 
 // 误差模型 模板参数：观测值维度，类型，连接顶点类型
@@ -49,6 +51,7 @@ public:
     _error(0, 0) = _measurement - std::exp(abc(0, 0) * _x * _x + abc(1, 0) * _x + abc(2, 0));
   }
 
+#if USE_ANALYTIC_DIFF
   // 计算雅可比矩阵
   virtual void linearizeOplus() override {
     const CurveFittingVertex *v = static_cast<const CurveFittingVertex *> (_vertices[0]);
@@ -58,10 +61,11 @@ public:
     _jacobianOplusXi[1] = -_x * y;
     _jacobianOplusXi[2] = -y;
   }
+#endif
 
-  virtual bool read(istream &in) {}
+  virtual bool read(istream &in) { return false; }
 
-  virtual bool write(ostream &out) const {}
+  virtual bool write(ostream &out) const { return false; }
 
 public:
   double _x;  // x 值， y 值为 _measurement

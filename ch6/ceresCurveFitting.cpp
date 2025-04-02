@@ -9,6 +9,38 @@
 
 using namespace std;
 
+#define USE_ANALYTIC_DIFF 1
+
+#if USE_ANALYTIC_DIFF // Analytic Diff
+
+/* 解析求导需要继承 SizedCostFunction 类，并重写 Evaluate 虚函数 */
+// 代价函数的计算模型
+class ANALYTIC_CURVE_FITTING_COST : public ceres::SizedCostFunction<1, 3>
+{
+public:
+  ANALYTIC_CURVE_FITTING_COST(double x, double y) : _x(x), _y(y) {}
+
+  // 残差的计算
+  virtual bool Evaluate(double const * const *parameters, double *residuals, double **jacobians) const override {
+    const Eigen::Map<const Eigen::Vector3d> abc(&parameters[0][0]);
+
+    double y_pred = ceres::exp(abc[0] * _x * _x + abc[1] * _x + abc[2]);
+    residuals[0] = _y - y_pred; // y-exp(ax^2+bx+c)
+
+    if (jacobians && jacobians[0])
+    {
+      jacobians[0][0] = -_x * _x * y_pred;
+      jacobians[0][1] = -_x * y_pred;
+      jacobians[0][2] = - y_pred;
+    }
+
+    return true;
+  }
+
+  const double _x, _y;    // x,y数据
+};
+#else // Auto diff
+/* 自动求导需要定义结构体，并自定义调用运算符 */
 // 代价函数的计算模型
 struct CURVE_FITTING_COST {
   CURVE_FITTING_COST(double x, double y) : _x(x), _y(y) {}
@@ -24,6 +56,8 @@ struct CURVE_FITTING_COST {
 
   const double _x, _y;    // x,y数据
 };
+#endif
+
 
 int main(int argc, char **argv) {
   double ar = 1.0, br = 2.0, cr = 1.0;         // 真实参数值
@@ -42,6 +76,18 @@ int main(int argc, char **argv) {
 
   double abc[3] = {ae, be, ce};
 
+#if USE_ANALYTIC_DIFF // Analytic Diff
+  // 构建最小二乘问题
+  ceres::Problem problem;
+  for (int i = 0; i < N; i++) {
+    problem.AddResidualBlock(     // 向问题中添加误差项
+      // 使用解析求导
+      new ANALYTIC_CURVE_FITTING_COST(x_data[i], y_data[i]),
+      nullptr,            // 核函数，这里不使用，为空
+      abc                 // 待估计参数
+    );
+  }
+#else // Auto diff
   // 构建最小二乘问题
   ceres::Problem problem;
   for (int i = 0; i < N; i++) {
@@ -54,6 +100,7 @@ int main(int argc, char **argv) {
       abc                 // 待估计参数
     );
   }
+#endif
 
   // 配置求解器
   ceres::Solver::Options options;     // 这里有很多配置项可以填
