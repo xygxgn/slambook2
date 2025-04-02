@@ -7,10 +7,19 @@ set( DBoW3_LIBS "/usr/local/lib/libDBoW3.a" )
 为
 set( DBoW3_LIBS "/usr/local/lib/libDBoW3.so" )
 
+报错:
+Could not find a configuration file for package "OpenCV" that is compatible
+  with requested version "3.1".
+解决方案
+在 CMakeLists.txt 中
+修改
+find_package( OpenCV 3.1 REQUIRED )
+为
+find_package( OpenCV REQUIRED )
 
-问题:
 
-
+报错:
+please generate the associate file called rgb.txt!
 解决方案
 下载数据集
 https://vision.in.tum.de/data/datasets/rgbd-dataset/download
