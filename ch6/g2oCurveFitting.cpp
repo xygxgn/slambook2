@@ -14,7 +14,7 @@
 
 using namespace std;
 
-#define USE_ANALYTIC_DIFF 0
+#define USE_ANALYTIC_DIFF 1
 
 // 曲线模型的顶点，模板参数：优化变量维度和数据类型
 class CurveFittingVertex : public g2o::BaseVertex<3, Eigen::Vector3d> {
